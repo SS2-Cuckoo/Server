@@ -1,0 +1,21 @@
+{
+    "name": "cuckoo-server",
+    "version": "1.0.0",
+    "description": "Node Server for SS2-Cuckoo",
+    "main": "src/app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/SS2-Cuckoo/Server/issues"
+    },
+    "homepage": "https://github.com/SS2-Cuckoo/Server#readme",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2"
+    }
+}
