@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import config from "../config";
+import config from "../config/index.js";
 
 async function connect() {
     if (global.connection && global.connection.state !== "disconnected") {

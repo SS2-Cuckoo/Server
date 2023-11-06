@@ -2,7 +2,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import connect from "./database";
+import connect from "./database.js";
 
 // const deviceRoutes = require("./router/Device"); // Device 라우터 가져오기
 // ... 기타 require ...

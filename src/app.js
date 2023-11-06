@@ -1,6 +1,7 @@
 import express from "express";
-import loaders from "./loaders";
-import { SERVICE_PORT } from "./config";
+import loaders from "./loaders/index.js";
+import config from "./config/index.js";
+const { SERVICE_PORT } = config;
 
 // for Debug
 console.clear();
