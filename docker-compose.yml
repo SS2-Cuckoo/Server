@@ -5,6 +5,8 @@ services:
         build: .
         container_name: api-boileplate-node-mysql
         command: npm run start
+        networks:
+            - db-net
         depends_on:
             - mysqldb
         ports:
@@ -23,6 +25,8 @@ services:
         expose:
             - 3306
         image: mysql:8.0
+        networks:
+            - db-net
         ports:
             - 3306:3306
         restart: always
@@ -34,3 +38,6 @@ services:
 volumes:
     db-config:
     db-data:
+
+networks:
+    db-net:
