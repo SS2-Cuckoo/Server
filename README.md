@@ -24,6 +24,7 @@ module.exports = {
     DB_PW: process.env.DATABASE_PW,
     DB_NAME: process.env.DATABASE_NAME,
     DB_HOST: process.env.DATABASE_HOST,
+    DB_PORT: process.env.DATABASE_PORT,
 };
 ```
 
@@ -41,9 +42,9 @@ $ cd Server
 -   [x] 개발 디렉토리 및 Git Repo 커밋.
 -   [x] express를 활용하여 API 통신 테스트
 -   [x] Docker BoilerPlate로 DB와 Sync
--   [ ] DB 활성화 (설치 및 연동 + migration)
--   [ ] DB Connect
--   [ ] API 등록 및 유닛 테스트
+-   [x] DB 활성화 (설치 및 연동 + migration)
+-   [x] DB Connect
+-   [x] API 등록 및 유닛 테스트
 -   [ ] API 연동 테스트
 -   [ ] 기타 등등
 
