@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
 // const Module = require("@/services/Module");
 
 const router = express.Router();
@@ -7,4 +7,4 @@ const router = express.Router();
 // router.get("/:module_idx", Module.getModuleInfo);
 // ... 기타 module 라우트 ...
 
-module.exports = router;
+export default router;

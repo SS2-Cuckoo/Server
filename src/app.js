@@ -1,6 +1,6 @@
-const express = require("express");
-const loaders = require("./loaders");
-const { SERVICE_PORT } = require("./config");
+import express from "express";
+import loaders from "./loaders";
+import { SERVICE_PORT } from "./config";
 
 // for Debug
 console.clear();

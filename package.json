@@ -3,8 +3,12 @@
     "version": "1.0.0",
     "description": "Node Server for SS2-Cuckoo",
     "main": "src/app.js",
+    "type": "module",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "build": "docker-compose build",
+        "clean:cache": "docker-compose rm -f",
+        "start": "nodemon ./src/server.js",
+        "start:background": "docker-compose up -d"
     },
     "keywords": [],
     "author": "",
@@ -13,9 +17,14 @@
         "url": "https://github.com/SS2-Cuckoo/Server/issues"
     },
     "homepage": "https://github.com/SS2-Cuckoo/Server#readme",
+    "devDependencies": {
+        "nodemon": "^2.0.7"
+    },
     "dependencies": {
+        "body-parse": "^0.1.0",
         "cors": "^2.8.5",
         "dotenv": "^16.3.1",
-        "express": "^4.18.2"
+        "express": "^4.18.2",
+        "mysql2": "^2.2.5"
     }
 }

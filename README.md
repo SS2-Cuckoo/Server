@@ -40,7 +40,7 @@ $ cd Server
 
 -   [x] 개발 디렉토리 및 Git Repo 커밋.
 -   [x] express를 활용하여 API 통신 테스트
--   [x] NodeJS 내장 라이브러리인 net을 활용하여 에이전트(클라이언트)와 통신 테스트
+-   [x] Docker BoilerPlate로 DB와 Sync
 -   [ ] DB 활성화 (설치 및 연동 + migration)
 -   [ ] DB Connect
 -   [ ] API 등록 및 유닛 테스트

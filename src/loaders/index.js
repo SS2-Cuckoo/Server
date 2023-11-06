@@ -1,11 +1,16 @@
 // loader.js
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import connect from "./database";
+
 // const deviceRoutes = require("./router/Device"); // Device 라우터 가져오기
 // ... 기타 require ...
 
-module.exports = async function ({ app }) {
+export default async function ({ app }) {
+    // DB Connection
+    await connect();
+
     // Middleware setup
     app.enable("trust proxy");
     app.use(cors());
@@ -35,4 +40,4 @@ module.exports = async function ({ app }) {
     });
 
     return app;
-};
+}
