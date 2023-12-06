@@ -4,8 +4,17 @@ import Memo from '../services/Memo.js';
 
 const router = express.Router();
 
-router.get('/memo/:userID', Memo.getUserMemo);
-// router.get("/:module_idx", Module.getModuleInfo);
-// ... 기타 module 라우트 ...
+// CREATE
+router.post('/memo', Memo.createMemo);
+
+// READ
+router.post('/memo/user', Memo.readUserAllMemo);
+router.get('/memo/:id', Memo.readMemo);
+
+// UPDATE
+router.put('/memo/:id', Memo.updateMemo);
+
+// DELETE
+router.delete('/memo/:id', Memo.deleteMemo);
 
 export default router;

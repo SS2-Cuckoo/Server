@@ -20,6 +20,7 @@ export default async function ({ app }) {
 
     // Use routers
     app.use('/', userRoutes);
+    app.use('/', memoRoutes);
 
     // Error Handling (404)
     app.use((req, res, next) => {
