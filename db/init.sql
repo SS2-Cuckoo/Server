@@ -1,62 +1,77 @@
 -- 사용자 생성 및 권한 부여
-CREATE USER 'dksu'@'localhost' IDENTIFIED BY '1234';
-GRANT ALL PRIVILEGES ON cuckoo.* TO 'dksu'@'localhost';
+-- CREATE USER 'dksu'@'localhost' IDENTIFIED BY '1234';
+-- GRANT ALL PRIVILEGES ON cuckoo.* TO 'dksu'@'localhost';
 
 -- 데이터베이스 선택
 USE cuckoo;
 
--- User 테이블 생성
 CREATE TABLE User (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(255) NOT NULL,
-  code VARCHAR(8) CHECK (LENGTH(code) BETWEEN 4 AND 8),
-  uuid CHAR(36) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(15),
+    UUID CHAR(36),
+    created_at TIMESTAMP
 );
 
--- Memo 테이블 생성
-CREATE TABLE Memo (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  title VARCHAR(255) DEFAULT NULL,
-  comment VARCHAR(256),
-  url_link TEXT,
-  noti_cycle TEXT, -- 상세 요구 사항에 따라 데이터 타입이 변경될 필요가 있음
-  noti_time TEXT,  -- 적절한 데이터 타입으로 변경 필요
-  noti_status BOOLEAN,
-  noti_count INT,
-  is_pinned BOOLEAN,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  remaining_noti_time TIME,
-  FOREIGN KEY (user_id) REFERENCES User(id)
-);
-
--- Tag 테이블 생성
-CREATE TABLE Tag (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  color CHAR(7) CHECK (color LIKE '#______'),
-  `order` INT
-);
-
--- MemoTag 테이블 생성
-CREATE TABLE MemoTag (
-  memo_id INT,
-  tag_id INT,
-  PRIMARY KEY (memo_id, tag_id),
-  FOREIGN KEY (memo_id) REFERENCES Memo(id),
-  FOREIGN KEY (tag_id) REFERENCES Tag(id)
-);
-
--- AlarmPreset 테이블 생성
 CREATE TABLE AlarmPreset (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  preset_name VARCHAR(255) NOT NULL,
-  preset_icon TEXT,
-  preset_value TEXT, -- 상세 요구 사항에 따라 데이터 타입이 변경될 필요가 있음
-  FOREIGN KEY (user_id) REFERENCES User(id)
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(8),
+    icon VARCHAR(36),
+    alarm_time TIME,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
--- Notification_Log 테이
+CREATE TABLE UserPreset (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    preset_id INT,
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (preset_id) REFERENCES AlarmPreset(id)
+);
+
+CREATE TABLE Memo (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    title VARCHAR(30),
+    comment VARCHAR(256),
+    url VARCHAR(2083),
+    thumbURL VARCHAR(2083),
+    noti_cycle INT,
+    noti_preset INT,
+    noti_count INT,
+    is_pinned BOOLEAN,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (noti_preset) REFERENCES AlarmPreset(id)
+);
+
+CREATE TABLE Tag (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(30),
+    color CHAR(30),
+    memoCount INT
+);
+
+CREATE TABLE MemoTag (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    memo_id INT,
+    tag_id INT,
+    FOREIGN KEY (memo_id) REFERENCES Memo(id),
+    FOREIGN KEY (tag_id) REFERENCES Tag(id)
+);
+
+CREATE TABLE NotiLog (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    sent_at TIMESTAMP,
+    related_preset INT,
+    FOREIGN KEY (related_preset) REFERENCES AlarmPreset(id)
+);
+
+CREATE TABLE MemoLog (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    log_id INT,
+    memo_id INT,
+    FOREIGN KEY (log_id) REFERENCES NotiLog(id),
+    FOREIGN KEY (memo_id) REFERENCES Memo(id)
+);

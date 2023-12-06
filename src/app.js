@@ -1,6 +1,6 @@
-import express from "express";
-import loaders from "./loaders/index.js";
-import config from "./config/index.js";
+import express from 'express';
+import loaders from './loaders/index.js';
+import config from './config/index.js';
 const { SERVICE_PORT } = config;
 
 // for Debug
@@ -16,7 +16,7 @@ async function startServer() {
             console.log(err);
             return;
         }
-        console.log(`Your server is ready !`);
+        console.log(`Your server is ready!!`);
     });
 }
 
