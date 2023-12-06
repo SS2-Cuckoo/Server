@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import connect from './database.js';
 import memoRoutes from '../router/MemoRoute.js';
+import userRoutes from '../router/UserRoute.js';
 
 // ... 기타 require ...
 
@@ -18,8 +19,7 @@ export default async function ({ app }) {
     app.use(bodyParser.json());
 
     // Use routers
-    app.use('/memo', memoRoutes);
-    // ... 기타 라우트 그룹 ...
+    app.use('/', userRoutes);
 
     // Error Handling (404)
     app.use((req, res, next) => {

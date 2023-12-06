@@ -1,5 +1,5 @@
 export default {
-    getAllUserMemo: async ({ res, params }) => {
+    getUserMemo: async ({ res, params }) => {
         const db = global.connection;
 
         try {
