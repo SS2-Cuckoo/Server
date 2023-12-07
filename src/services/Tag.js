@@ -40,6 +40,11 @@ export default {
         const { type, identifier } = query;
         const db = global.connection;
 
+        // 필수 파라미터 검증
+        if (!type || !identifier) {
+            return res.status(400).json({ msg: 'Missing required parameters' });
+        }
+
         let userId;
         if (type === 'uuid') {
             const user = await db.query('SELECT id FROM User WHERE UUID = ?', [identifier]);
@@ -67,6 +72,11 @@ export default {
         const { id } = params;
         const db = global.connection;
 
+        // 필수 파라미터 검증
+        if (!id) {
+            return res.status(400).json({ msg: 'Missing required parameters' });
+        }
+
         try {
             const tag = await db.query('SELECT * FROM Tag WHERE id = ?', [id]);
             if (tag[0].length === 0) {
@@ -83,6 +93,11 @@ export default {
         const { id } = params;
         const { name, color } = body;
         const db = global.connection;
+
+        // 필수 파라미터 검증
+        if (!id) {
+            return res.status(400).json({ msg: 'Missing required parameters' });
+        }
 
         // 업데이트할 컬럼과 값 설정
         const updates = [];
@@ -115,6 +130,11 @@ export default {
     deleteTag: async ({ params, res }) => {
         const { id } = params;
         const db = global.connection;
+
+        // 필수 파라미터 검증
+        if (!id) {
+            return res.status(400).json({ msg: 'Missing required parameters' });
+        }
 
         try {
             // 먼저 Tag를 참조하는 MemoTag 테이블의 행을 삭제

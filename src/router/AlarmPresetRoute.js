@@ -10,7 +10,7 @@ router.post('/preset', AlarmPreset.createAlarmPreset);
 router.get('/preset/:preset_id', AlarmPreset.readAlarmPresetByID);
 
 // UPDATE
-router.patch('/preset/:preset_id', AlarmPreset.updateAlarmPresetByID);
+router.put('/preset/:preset_id', AlarmPreset.updateAlarmPresetByID);
 
 // DELETE
 router.delete('/preset/:preset_id', AlarmPreset.deleteAlarmPreset);

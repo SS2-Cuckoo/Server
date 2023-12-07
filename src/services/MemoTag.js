@@ -9,6 +9,15 @@ export default {
         }
 
         try {
+            const existingPair = await db.query('SELECT * FROM MemoTag WHERE memo_id = ? AND tag_id = ?', [
+                memo_id,
+                tag_id,
+            ]);
+
+            if (existingPair[0].length > 0) {
+                return res.status(409).json({ msg: 'This tag is already assigned to the memo' });
+            }
+
             await db.query('INSERT INTO MemoTag (memo_id, tag_id) VALUES (?, ?)', [memo_id, tag_id]);
             res.json({ msg: 'Tag added to memo successfully' });
         } catch (err) {

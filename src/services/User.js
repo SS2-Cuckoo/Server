@@ -28,12 +28,17 @@ export default {
         const db = global.connection;
         const userID = params.id;
 
+        // 필수 파라미터 검증
+        if (!userID) {
+            return res.status(400).json({ msg: 'Missing required parameters' });
+        }
+
         try {
             const results = await db.query('SELECT * FROM User WHERE id = ?', [userID]);
-            if (results.length === 0) {
+            if (results[0].length === 0) {
                 res.status(404).send('User not found');
             } else {
-                res.json(results[0]);
+                res.json(results[0][0]);
             }
         } catch (err) {
             console.error(err);
@@ -45,12 +50,17 @@ export default {
         const db = global.connection;
         const userUUID = params.uuid;
 
+        // 필수 파라미터 검증
+        if (!userUUID) {
+            return res.status(400).json({ msg: 'Missing required parameters' });
+        }
+
         try {
             const results = await db.query('SELECT * FROM User WHERE UUID = ?', [userUUID]);
-            if (results.length === 0) {
+            if (results[0].length === 0) {
                 res.status(404).send('User not found');
             } else {
-                res.json(results[0]);
+                res.json(results[0][0]);
             }
         } catch (err) {
             console.error(err);
@@ -61,6 +71,11 @@ export default {
     deleteUser: async ({ params, res }) => {
         const db = global.connection;
         const { type, identifier } = params;
+
+        // 필수 파라미터 검증
+        if (!type || !identifier) {
+            return res.status(400).json({ msg: 'Missing required parameters' });
+        }
 
         let query = '';
         if (type === 'id') {

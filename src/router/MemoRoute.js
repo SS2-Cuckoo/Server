@@ -9,12 +9,12 @@ router.post('/memo', Memo.createMemo);
 
 // READ
 router.get('/memo/user', Memo.readUserAllMemo);
-router.get('/memo/:id', Memo.readMemo);
+router.get('/memo/:memo_id', Memo.readMemo);
 
 // UPDATE
-router.put('/memo/:id', Memo.updateMemo);
+router.put('/memo/:memo_id', Memo.updateMemo);
 
 // DELETE
-router.delete('/memo/:id', Memo.deleteMemo);
+router.delete('/memo/:memo_id', Memo.deleteMemo);
 
 export default router;

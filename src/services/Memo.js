@@ -102,7 +102,7 @@ export default {
 
     readMemo: async ({ params, res }) => {
         const db = global.connection;
-        const memo_id = params.id;
+        const memo_id = params.memo_id;
 
         try {
             const results = await db.query('SELECT * FROM Memo WHERE id = ?', [memo_id]);
@@ -119,7 +119,7 @@ export default {
 
     updateMemo: async ({ body, params, res }) => {
         const db = global.connection;
-        const memo_id = params.id;
+        const memo_id = params.memo_id;
         const updateData = body;
 
         try {
@@ -140,7 +140,7 @@ export default {
 
     deleteMemo: async ({ params, res }) => {
         const db = global.connection;
-        const memo_id = params.id;
+        const memo_id = params.memo_id;
 
         try {
             await db.query('DELETE FROM MemoTag WHERE memo_id = ?', [memo_id]);
