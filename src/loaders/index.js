@@ -5,6 +5,7 @@ import cors from 'cors';
 import connect from './database.js';
 import memoRoutes from '../router/MemoRoute.js';
 import userRoutes from '../router/UserRoute.js';
+import tagRoutes from '../router/TagRoute.js';
 
 // ... 기타 require ...
 
@@ -21,6 +22,7 @@ export default async function ({ app }) {
     // Use routers
     app.use('/', userRoutes);
     app.use('/', memoRoutes);
+    app.use('/', tagRoutes);
 
     // Error Handling (404)
     app.use((req, res, next) => {

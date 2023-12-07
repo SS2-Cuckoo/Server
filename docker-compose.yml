@@ -3,7 +3,7 @@ version: '3'
 services:
     api:
         build: .
-        container_name: api-boileplate-node-mysql
+        container_name: cuckoo-api
         command: npm run start
         networks:
             - db-net
@@ -15,7 +15,7 @@ services:
             - .:/usr/src/app
 
     mysqldb:
-        container_name: db-boilerplate-node-mysql
+        container_name: cuckoo-db
         env_file: ./.env
         environment:
             MYSQL_PASSWORD: ${DATABASE_PW}
@@ -33,6 +33,7 @@ services:
         volumes:
             - db-config:/etc/mysql
             - db-data:/var/lib/mysql
+            - ./my.cnf:/etc/mysql/my.cnf
             - ./db/backup/files/:/data_backup/
 
 volumes:
