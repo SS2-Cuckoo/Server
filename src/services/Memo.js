@@ -69,9 +69,9 @@ export default {
         }
     },
 
-    readUserAllMemo: async ({ body, res }) => {
+    readUserAllMemo: async ({ query, res }) => {
         const db = global.connection;
-        const { type, identifier } = body;
+        const { type, identifier } = query;
 
         if (!type || !identifier) {
             return res.status(400).json({ msg: 'Required parameter missing' });

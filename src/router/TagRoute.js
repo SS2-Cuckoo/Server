@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/tag', Tag.createTag);
 
 // READ
-router.post('/tag/user', Tag.readUserAllTag);
+router.get('/tag/user', Tag.readUserAllTag);
 router.get('/tag/:id', Tag.readTag);
 
 // UPDATE

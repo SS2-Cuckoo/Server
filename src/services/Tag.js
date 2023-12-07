@@ -36,19 +36,19 @@ export default {
         }
     },
 
-    readUserAllTag: async ({ body, res }) => {
-        const { type, id, uuid } = body;
+    readUserAllTag: async ({ query, res }) => {
+        const { type, identifier } = query;
         const db = global.connection;
 
         let userId;
         if (type === 'uuid') {
-            const user = await db.query('SELECT id FROM User WHERE UUID = ?', [uuid]);
+            const user = await db.query('SELECT id FROM User WHERE UUID = ?', [identifier]);
             if (user[0].length === 0) {
                 return res.status(404).json({ msg: 'User not found' });
             }
             userId = user[0][0].id;
         } else {
-            userId = id;
+            userId = identifier;
         }
 
         try {

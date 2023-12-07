@@ -6,6 +6,7 @@ import connect from './database.js';
 import memoRoutes from '../router/MemoRoute.js';
 import userRoutes from '../router/UserRoute.js';
 import tagRoutes from '../router/TagRoute.js';
+import memoTagRoutes from '../router/MemoTagRoute.js';
 
 // ... 기타 require ...
 
@@ -23,6 +24,7 @@ export default async function ({ app }) {
     app.use('/', userRoutes);
     app.use('/', memoRoutes);
     app.use('/', tagRoutes);
+    app.use('/', memoTagRoutes);
 
     // Error Handling (404)
     app.use((req, res, next) => {
