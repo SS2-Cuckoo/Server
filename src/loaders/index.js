@@ -7,6 +7,8 @@ import memoRoutes from '../router/MemoRoute.js';
 import userRoutes from '../router/UserRoute.js';
 import tagRoutes from '../router/TagRoute.js';
 import memoTagRoutes from '../router/MemoTagRoute.js';
+import alarmPresetRoutes from '../router/AlarmPresetRoute.js';
+import userPresetRoutes from '../router/UserPresetRoute.js';
 
 // ... 기타 require ...
 
@@ -25,6 +27,8 @@ export default async function ({ app }) {
     app.use('/', memoRoutes);
     app.use('/', tagRoutes);
     app.use('/', memoTagRoutes);
+    app.use('/', alarmPresetRoutes);
+    app.use('/', userPresetRoutes);
 
     // Error Handling (404)
     app.use((req, res, next) => {

@@ -11,7 +11,7 @@ router.get('/tag/user', Tag.readUserAllTag);
 router.get('/tag/:id', Tag.readTag);
 
 // UPDATE
-router.put('/tag/:id', Tag.updateTag);
+router.patch('/tag/:id', Tag.updateTag);
 
 // DELETE
 router.delete('/tag/:id', Tag.deleteTag);
