@@ -79,3 +79,12 @@ CREATE TABLE MemoLog (
     FOREIGN KEY (log_id) REFERENCES NotiLog(id),
     FOREIGN KEY (memo_id) REFERENCES Memo(id)
 ) DEFAULT CHARSET=utf8mb4;
+
+-- UserTag 테이블 생성
+CREATE TABLE UserTag (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    tag_id INT,
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (tag_id) REFERENCES Tag(id)
+) DEFAULT CHARSET=utf8mb4;

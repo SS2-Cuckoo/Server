@@ -10,6 +10,7 @@ import memoTagRoutes from '../router/MemoTagRoute.js';
 import alarmPresetRoutes from '../router/AlarmPresetRoute.js';
 import userPresetRoutes from '../router/UserPresetRoute.js';
 import notiLogRoutes from '../router/NotiLogRoute.js';
+import userTagRoutes from '../router/UserTagRoute.js';
 
 // ... 기타 require ...
 
@@ -31,6 +32,7 @@ export default async function ({ app }) {
     app.use('/', alarmPresetRoutes);
     app.use('/', userPresetRoutes);
     app.use('/', notiLogRoutes);
+    app.use('/', userTagRoutes);
 
     // Error Handling (404)
     app.use((req, res, next) => {
