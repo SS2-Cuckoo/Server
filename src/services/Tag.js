@@ -1,42 +1,46 @@
 export default {
     createTag: async ({ body, res }) => {
-        let { name, color, user_id, uuid } = body;
+        let { name, color, type, identifier } = body;
         const db = global.connection;
 
         // 입력 값 검증
-        if (!name || !color || color.length !== 6) {
+        if (!name || !type || !identifier || !color || color.length !== 6) {
             return res.status(400).json({ msg: 'Invalid input' });
         }
 
-        // UUID가 제공된 경우, user_id를 조회
-        if (uuid) {
-            const userResult = await db.query('SELECT id FROM User WHERE UUID = ?', [uuid]);
+        try {
+            let user_id;
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
 
-            if (userResult[0].length === 0) {
+            if (userCheckResult[0].length === 0) {
                 return res.status(404).json({ msg: 'User not found' });
             }
-            user_id = userResult[0][0].id;
-        }
 
-        const existingPair = await db.query('SELECT * FROM UserTag WHERE user_id = ? AND tag_id = ?', [
-            user_id,
-            tag_id,
-        ]);
+            // Tag 이름 중복 체크
+            const existingTag = await db.query('SELECT id FROM Tag WHERE name = ?', [name]);
+            if (existingTag[0].length > 0) {
+                const existingTagId = existingTag[0][0].id;
+                // UserTag에서 해당 user_id와 연관된 Tag가 있는지 확인
+                const userTagCheck = await db.query('SELECT * FROM UserTag WHERE user_id = ? AND tag_id = ?', [
+                    user_id,
+                    existingTagId,
+                ]);
+                if (userTagCheck[0].length > 0) {
+                    return res.status(409).json({ msg: 'Tag already exists for this user' });
+                }
+            }
 
-        if (existingPair[0].length > 0) {
-            return res.status(409).json({ msg: 'This tag is already assigned to the user' });
-        }
-
-        try {
-            // Tag 생성
+            // 새 Tag 생성
             const tagResult = await db.query('INSERT INTO Tag (name, color, memoCount) VALUES (?, ?, 0)', [
                 name,
                 color,
             ]);
             const tag_id = tagResult[0].insertId;
 
-            // MemoTag에 관계 생성
-            await db.query('INSERT INTO MemoTag (memo_id, tag_id) VALUES (?, ?)', [user_id, tag_id]);
+            // UserTag에 관계 생성
+            await db.query('INSERT INTO UserTag (user_id, tag_id) VALUES (?, ?)', [user_id, tag_id]);
 
             res.status(201).json({ msg: 'Tag created', tagId: tag_id });
         } catch (err) {
@@ -146,8 +150,9 @@ export default {
         }
 
         try {
-            // 먼저 Tag를 참조하는 MemoTag 테이블의 행을 삭제
+            // 먼저 Tag를 참조하는 MemoTag, UserTag 테이블의 행을 삭제
             await db.query('DELETE FROM MemoTag WHERE tag_id = ?', [id]);
+            await db.query('DELETE FROM UserTag WHERE tag_id = ?', [id]);
 
             // Tag 테이블에서 해당 태그 삭제
             const deleteResult = await db.query('DELETE FROM Tag WHERE id = ?', [id]);
