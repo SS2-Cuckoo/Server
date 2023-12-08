@@ -44,6 +44,8 @@ export default {
                 return res.status(404).json({ msg: 'User not found' });
             }
 
+            const user_id = userCheckResult[0][0].id;
+
             const results = await db.query('SELECT * FROM UserTag WHERE user_id = ?', [user_id]);
 
             res.json(results[0].map(row => row.tag_id));

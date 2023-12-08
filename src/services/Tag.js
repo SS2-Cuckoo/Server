@@ -18,6 +18,15 @@ export default {
             user_id = userResult[0][0].id;
         }
 
+        const existingPair = await db.query('SELECT * FROM UserTag WHERE user_id = ? AND tag_id = ?', [
+            user_id,
+            tag_id,
+        ]);
+
+        if (existingPair[0].length > 0) {
+            return res.status(409).json({ msg: 'This tag is already assigned to the user' });
+        }
+
         try {
             // Tag 생성
             const tagResult = await db.query('INSERT INTO Tag (name, color, memoCount) VALUES (?, ?, 0)', [
