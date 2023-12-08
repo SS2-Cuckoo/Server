@@ -28,10 +28,10 @@ export default {
     },
 
     readTagsOfUser: async ({ query, res }) => {
-        const { user_id, type, identifier } = query;
+        const { type, identifier } = query;
         const db = global.connection;
 
-        if (!user_id || !type || !identifier) {
+        if (!type || !identifier) {
             return res.status(400).json({ msg: 'Required parameters are missing' });
         }
 
