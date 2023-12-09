@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/preset', AlarmPreset.createAlarmPreset);
 
 // READ
+router.get('/preset', AlarmPreset.readUserPreset);
 router.get('/preset/:preset_id', AlarmPreset.readAlarmPresetByID);
 
 // UPDATE

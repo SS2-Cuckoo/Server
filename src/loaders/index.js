@@ -8,7 +8,6 @@ import userRoutes from '../router/UserRoute.js';
 import tagRoutes from '../router/TagRoute.js';
 import memoTagRoutes from '../router/MemoTagRoute.js';
 import alarmPresetRoutes from '../router/AlarmPresetRoute.js';
-import userPresetRoutes from '../router/UserPresetRoute.js';
 import notiLogRoutes from '../router/NotiLogRoute.js';
 import userTagRoutes from '../router/UserTagRoute.js';
 
@@ -30,7 +29,6 @@ export default async function ({ app }) {
     app.use('/', tagRoutes);
     app.use('/', memoTagRoutes);
     app.use('/', alarmPresetRoutes);
-    app.use('/', userPresetRoutes);
     app.use('/', notiLogRoutes);
     app.use('/', userTagRoutes);
 

@@ -6,7 +6,7 @@ async function connect() {
         return global.connection;
     }
 
-    const connection = await mysql.createConnection({
+    const connection = await mysql.createPool({
         database: config.DB_NAME,
         host: config.DB_HOST,
         password: config.DB_PW,

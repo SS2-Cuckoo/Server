@@ -70,10 +70,17 @@ export default {
         }
 
         try {
-            const tags = await db.query(
-                'SELECT * FROM Tag WHERE id IN (SELECT tag_id FROM MemoTag WHERE memo_id IN (SELECT id FROM Memo WHERE user_id = ?)) ORDER BY id',
-                [userId]
-            );
+            // UserTag 테이블에서 해당 user_id에 해당하는 모든 Tag의 tag_id 찾기
+            const userTags = await db.query('SELECT tag_id FROM UserTag WHERE user_id = ?', [userId]);
+
+            // 찾은 tag_id들로 Tag 정보 조회
+            const tagIds = userTags[0].map(userTag => userTag.tag_id);
+            if (tagIds[0].length === 0) {
+                return res.json([]); // 태그가 없는 경우 빈 배열 반환
+            }
+
+            const tags = await db.query(`SELECT * FROM Tag WHERE id IN (?) ORDER BY id ASC`, [tagIds]);
+
             res.json(tags[0]);
         } catch (err) {
             console.log(err);
@@ -102,7 +109,7 @@ export default {
         }
     },
 
-    updateTag: async ({ params, body, res }) => {
+    updateTag: async ({ query, params, body, res }) => {
         const { id } = params;
         const { name, color } = body;
         const db = global.connection;
@@ -110,6 +117,28 @@ export default {
         // 필수 파라미터 검증
         if (!id) {
             return res.status(400).json({ msg: 'Missing required parameters' });
+        }
+
+        const { type, identifier } = query;
+
+        if (!type || !identifier) {
+            return res.status(400).json({ msg: 'Required parameters are missing' });
+        }
+
+        let user_id;
+        try {
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
+
+            if (userCheckResult[0].length === 0) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            user_id = userCheckResult[0][0].id;
+        } catch (err) {
+            console.error(err);
+            res.status(403).send({ msg: 'Unauthorized approach' });
         }
 
         // 업데이트할 컬럼과 값 설정
@@ -140,13 +169,34 @@ export default {
         }
     },
 
-    deleteTag: async ({ params, res }) => {
+    deleteTag: async ({ query, params, res }) => {
         const { id } = params;
+        const { type, identifier } = query;
         const db = global.connection;
 
         // 필수 파라미터 검증
         if (!id) {
             return res.status(400).json({ msg: 'Missing required parameters' });
+        }
+
+        if (!type || !identifier) {
+            return res.status(400).json({ msg: 'Required parameters are missing' });
+        }
+
+        let user_id;
+        try {
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
+
+            if (userCheckResult[0].length === 0) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            user_id = userCheckResult[0][0].id;
+        } catch (err) {
+            console.error(err);
+            res.status(403).send({ msg: 'Unauthorized approach' });
         }
 
         try {

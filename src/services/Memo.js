@@ -1,9 +1,16 @@
 import fetch from 'node-fetch';
+import urlModule from 'url';
+import cheerio from 'cheerio';
 
-const getThumbURL = async url => {
-    if (url.trim() === '') return '';
+async function getThumbURL(url) {
+    if (url.trim() === '') {
+        return '';
+    }
 
     try {
+        const parsedUrl = urlModule.parse(url);
+        const defaultDomain = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -11,36 +18,66 @@ const getThumbURL = async url => {
         }
 
         const htmlText = await response.text();
-        const match = htmlText.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
+        const $ = cheerio.load(htmlText);
 
-        if (match && match[1]) {
-            return match[1];
-        } else {
-            return '';
+        const ogImageMeta = $('meta[property="og:image"]');
+        if (ogImageMeta.length > 0) {
+            const thumbnailURL = ogImageMeta.attr('content');
+            if (thumbnailURL) {
+                return thumbnailURL;
+            }
         }
+
+        const defaultResponse = await fetch(defaultDomain);
+        if (defaultResponse.ok) {
+            const defaultHtmlText = await defaultResponse.text();
+            const $default = cheerio.load(defaultHtmlText);
+
+            const defaultOgImageMeta = $default('meta[property="og:image"]');
+            if (defaultOgImageMeta.length > 0) {
+                const defaultThumbnailURL = defaultOgImageMeta.attr('content');
+                if (defaultThumbnailURL) {
+                    return defaultThumbnailURL;
+                }
+            }
+        }
+
+        throw new Error('No og:image tag found on the page.');
     } catch (error) {
         console.error('Error:', error.message);
         return '';
     }
-};
+}
 
 export default {
     createMemo: async ({ body, res }) => {
         const db = global.connection;
-        const { user_uuid, title, comment, noti_cycle, noti_preset, isPinned, url, noti_count } = body;
+        const { type, identifier, title, comment, noti_cycle, noti_preset, isPinned, url, noti_count } = body;
 
         // 필수 파라미터 검증
-        if (!user_uuid || !title || comment === undefined || !noti_cycle || !noti_preset || isPinned === undefined) {
+        if (
+            !type ||
+            !identifier ||
+            !title ||
+            comment === undefined ||
+            !noti_cycle ||
+            !noti_preset ||
+            isPinned === undefined
+        ) {
             return res.status(400).json({ msg: 'Required parameter missing' });
         }
 
         try {
-            // user_uuid로 user_id 찾기
-            const userResults = await db.query('SELECT id FROM User WHERE UUID = ?', [user_uuid]);
-            if (userResults[0].length === 0) {
+            let user_id;
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
+
+            if (userCheckResult[0].length === 0) {
                 return res.status(404).json({ msg: 'User not found' });
             }
-            const user_id = userResults[0][0].id;
+
+            user_id = userCheckResult[0][0].id;
 
             const thumbURL = await getThumbURL(url || '');
 
@@ -58,8 +95,6 @@ export default {
                 updated_at: new Date(),
             };
 
-            console.log(newMemo);
-
             await db.query('INSERT INTO Memo SET ?', newMemo);
 
             res.status(201).json({ msg: 'Memo created successfully' });
@@ -74,23 +109,26 @@ export default {
         const { type, identifier } = query;
 
         if (!type || !identifier) {
-            return res.status(400).json({ msg: 'Required parameter missing' });
+            return res.status(400).json({ msg: 'Required parameters are missing' });
+        }
+
+        let user_id;
+        try {
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
+
+            if (userCheckResult[0].length === 0) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            user_id = userCheckResult[0][0].id;
+        } catch (err) {
+            console.error(err);
+            res.status(403).send({ msg: 'Unauthorized approach' });
         }
 
         try {
-            let user_id;
-            if (type === 'uuid') {
-                const userResults = await db.query('SELECT id FROM User WHERE UUID = ?', [identifier]);
-                if (userResults[0].length === 0) {
-                    return res.status(404).json({ msg: 'User not found' });
-                }
-                user_id = userResults[0][0].id;
-            } else if (type === 'id') {
-                user_id = identifier;
-            } else {
-                return res.status(400).json({ msg: 'Invalid type' });
-            }
-
             const memos = await db.query('SELECT * FROM Memo WHERE user_id = ? ORDER BY updated_at DESC', [user_id]);
 
             res.json(memos[0]);
@@ -103,6 +141,27 @@ export default {
     readMemo: async ({ params, res }) => {
         const db = global.connection;
         const memo_id = params.memo_id;
+        const { type, identifier } = query;
+
+        if (!type || !identifier) {
+            return res.status(400).json({ msg: 'Required parameters are missing' });
+        }
+
+        let user_id;
+        try {
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
+
+            if (userCheckResult[0].length === 0) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            user_id = userCheckResult[0][0].id;
+        } catch (err) {
+            console.error(err);
+            res.status(403).send({ msg: 'Unauthorized approach' });
+        }
 
         try {
             const results = await db.query('SELECT * FROM Memo WHERE id = ?', [memo_id]);
@@ -117,10 +176,30 @@ export default {
         }
     },
 
-    updateMemo: async ({ body, params, res }) => {
+    updateMemo: async ({ query, body, params, res }) => {
         const db = global.connection;
         const memo_id = params.memo_id;
         const updateData = body;
+        const { type, identifier } = query;
+
+        if (!type || !identifier) {
+            return res.status(400).json({ msg: 'Required parameters are missing' });
+        }
+
+        try {
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
+
+            if (userCheckResult[0].length === 0) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            user_id = userCheckResult[0][0].id;
+        } catch (err) {
+            console.error(err);
+            res.status(403).send({ msg: 'Unauthorized approach' });
+        }
 
         try {
             const findMemo = await db.query('SELECT * FROM Memo WHERE id = ?', [memo_id]);
@@ -138,9 +217,30 @@ export default {
         }
     },
 
-    deleteMemo: async ({ params, res }) => {
+    deleteMemo: async ({ query, params, res }) => {
         const db = global.connection;
         const memo_id = params.memo_id;
+        const { type, identifier } = query;
+
+        if (!type || !identifier) {
+            return res.status(400).json({ msg: 'Required parameters are missing' });
+        }
+
+        let user_id;
+        try {
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
+
+            if (userCheckResult[0].length === 0) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            user_id = userCheckResult[0][0].id;
+        } catch (err) {
+            console.error(err);
+            res.status(403).send({ msg: 'Unauthorized approach' });
+        }
 
         try {
             await db.query('DELETE FROM MemoTag WHERE memo_id = ?', [memo_id]);

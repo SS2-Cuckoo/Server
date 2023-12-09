@@ -78,12 +78,28 @@ export default {
         }
     },
 
-    deleteTagMemo: async ({ body, res }) => {
+    deleteTagMemo: async ({ query, body, res }) => {
         const { memo_id, tag_id } = body;
+        const { type, identifier } = query;
         const db = global.connection;
 
-        if (!memo_id || !tag_id) {
+        if (!memo_id || !tag_id || !type || !identifier) {
             return res.status(400).json({ msg: 'Required parameters are missing' });
+        }
+
+        try {
+            const userCheckQuery =
+                type === 'id' ? 'SELECT id FROM User WHERE id = ?' : 'SELECT id FROM User WHERE UUID = ?';
+            const userCheckResult = await db.query(userCheckQuery, [identifier]);
+
+            if (userCheckResult[0].length === 0) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            user_id = userCheckResult[0][0].id;
+        } catch (err) {
+            console.error(err);
+            res.status(403).send({ msg: 'Unauthorized approach' });
         }
 
         try {

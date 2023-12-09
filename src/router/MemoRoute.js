@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/memo', Memo.createMemo);
 
 // READ
-router.get('/memo/user', Memo.readUserAllMemo);
+router.get('/memo', Memo.readUserAllMemo);
 router.get('/memo/:memo_id', Memo.readMemo);
 
 // UPDATE
