@@ -253,4 +253,17 @@ export default {
             res.status(500).send({ msg: 'Database error' });
         }
     },
+
+    getThumbnailURL: async ({ query, res }) => {
+        const { baseURL = '' } = query;
+
+        try {
+            const refinedThumbURL = await getThumbURL(baseURL);
+
+            res.status(200).send({ url: refinedThumbURL });
+        } catch (err) {
+            console.error(err);
+            res.status(400).send({ msg: 'Invalid URL' });
+        }
+    },
 };

@@ -10,6 +10,7 @@ router.post('/memo', Memo.createMemo);
 // READ
 router.get('/memo', Memo.readUserAllMemo);
 router.get('/memo/:memo_id', Memo.readMemo);
+router.get('/thumb', Memo.getThumbnailURL);
 
 // UPDATE
 router.put('/memo/:memo_id', Memo.updateMemo);
